@@ -1,22 +1,12 @@
-export default function Signup() {
+export default function Signin() {
   return (
     <div>
       <section className="h-screen flex justify-center items-center">
         <form>
           <div className="w-[300px] h-auto border-2 border-red-500 p-4 rounded-md">
             <h1 className="flex w-full justify-center underline font-bold">
-              Signup
+              Signin
             </h1>
-
-            <div className="grid my-4">
-              <label htmlFor="email">Name</label>
-              <input
-                className="px-3 border border-black"
-                type="text"
-                id="name"
-                name="name"
-              />
-            </div>
 
             <div className="grid my-4">
               <label htmlFor="email">Email</label>
