@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 export default function AllBooks() {
   return (
     <div>
@@ -59,12 +61,12 @@ export default function AllBooks() {
 
         {/* <!-- Add New Button --> */}
         <div className="mt-8">
-          <a
-            href="/add-new-book"
+          <Link
+            to="/add-new-book"
             className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 focus:outline-none"
           >
             Add New
-          </a>
+          </Link>
         </div>
       </div>
     </div>
