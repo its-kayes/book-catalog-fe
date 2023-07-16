@@ -1,6 +1,23 @@
+// import { Dispatch } from '@reduxjs/toolkit';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { IInitialState, getBooks } from '../store/slice/bookSlice';
+import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
+import { IBook } from '../interface/book/book.interface';
 
 export default function AllBooks() {
+  const { books }: { books: IBook[] } = useSelector(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (state: any) => state.books
+  );
+
+  const dispatch: ThunkDispatch<IInitialState, void, AnyAction> = useDispatch();
+
+  useEffect(() => {
+    dispatch(getBooks());
+  }, [dispatch]);
+
   return (
     <div>
       <div className="container mx-auto p-8">
@@ -36,27 +53,16 @@ export default function AllBooks() {
 
         {/* <!-- Book List --> */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
-          {/* <!-- Card 1 --> */}
-          <div className="bg-white rounded-lg shadow-md">
-            <div className="p-4">
-              <h2 className="text-lg font-bold mb-2">Book 1</h2>
-              <p className="text-gray-600 mb-2">Author: John Doe</p>
-              <p className="text-gray-600 mb-2">Genre: Mystery</p>
-              <p className="text-gray-600">Publication Date: 2022-05-15</p>
+          {books.map((item: IBook) => (
+            <div className="bg-white rounded-lg shadow-md">
+              <div className="p-4">
+                <h2 className="text-lg font-bold mb-2">{item.title}</h2>
+                <p className="text-gray-600 mb-2">Author: {item.author}</p>
+                <p className="text-gray-600 mb-2">Genre: {item.genre}</p>
+                <p className="text-gray-600">Publication: {item.publication}</p>
+              </div>
             </div>
-          </div>
-
-          {/* <!-- Card 2 --> */}
-          <div className="bg-white rounded-lg shadow-md">
-            <div className="p-4">
-              <h2 className="text-lg font-bold mb-2">Book 2</h2>
-              <p className="text-gray-600 mb-2">Author: Jane Smith</p>
-              <p className="text-gray-600 mb-2">Genre: Fantasy</p>
-              <p className="text-gray-600">Publication Date: 2021-09-30</p>
-            </div>
-          </div>
-
-          {/* <!-- Add more cards as needed --> */}
+          ))}
         </div>
 
         {/* <!-- Add New Button --> */}
