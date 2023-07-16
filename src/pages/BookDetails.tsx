@@ -4,11 +4,11 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { IInitialState } from '../store/slice/bookSlice';
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
-import { getBookDetails } from '../store/slice/singleBookSlice';
+import { getBookDetails, getBookReviews } from '../store/slice/singleBookSlice';
 
 export default function BookDetails() {
   const { id } = useParams();
-  const { singleBook, isSuccess, isLoading } = useSelector(
+  const { singleBook, isSuccess, isLoading, review } = useSelector(
     (state: any) => state.singleBook
   );
 
@@ -25,7 +25,12 @@ export default function BookDetails() {
     dispatch(getBookDetails(id));
   }, [dispatch, id]);
 
-  console.log('BookDetails', id, singleBook);
+  const handleLoadReview = () => {
+    console.log('handleLoadReview');
+    dispatch(getBookReviews(singleBook.title));
+  };
+
+  console.log('BookDetails', review);
   return (
     <div>
       <div className="container mx-auto p-8">
@@ -41,9 +46,27 @@ export default function BookDetails() {
 
           <h2 className="text-lg font-bold mb-4">Reviews</h2>
           <div className="border border-gray-300 p-4 rounded">
-            <p className="text-gray-600">Review 1</p>
-            <p className="text-gray-600">Review 2</p>
-            <p className="text-gray-600">Review 3</p>
+            {review === null ? (
+              <div
+                onClick={handleLoadReview}
+                className="w-full h-full min-h-[100px] flex justify-center items-center bg-gray-100 cursor-pointer hover:bg-gray-200 transition duration-300 ease-in-out rounded-md"
+              >
+                Load reviews
+              </div>
+            ) : (
+              <div>
+                {review.map((item: any) => (
+                  <>
+                    <p className="text-gray-600">
+                      <span className="font-bold">{item.review}</span> by{' '}
+                      <span className="font-bold"> {item.username} </span> with
+                      rating <span className="font-bold"> {item.rating} </span>
+                    </p>
+                  </>
+                ))}
+              </div>
+            )}
+            {/* */}
           </div>
 
           <div className="flex justify-end mt-8">
