@@ -20,7 +20,7 @@ export default function AllBooks() {
   }, [dispatch]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleSearchTerm = (e: any) => {
+  const handleSearchTerm = () => {
     const isSearchTermEmpty = searchTerm.length === 0;
     if (isSearchTermEmpty) {
       return;
