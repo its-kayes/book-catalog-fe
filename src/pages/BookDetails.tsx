@@ -1,16 +1,20 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import { IInitialState } from '../store/slice/bookSlice';
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
-import { getBookDetails, getBookReviews } from '../store/slice/singleBookSlice';
+import {
+  getBookDetails,
+  getBookReviews,
+  handleDeleteBook,
+} from '../store/slice/singleBookSlice';
 
 export default function BookDetails() {
   const { id } = useParams();
-  const { singleBook, isSuccess, isLoading, review } = useSelector(
-    (state: any) => state.singleBook
-  );
+  const { singleBook, isSuccess, isLoading, isDelete, review, deleteMessage } =
+    useSelector((state: any) => state.singleBook);
 
   const dispatch: ThunkDispatch<IInitialState, void, AnyAction> = useDispatch();
 
@@ -26,11 +30,23 @@ export default function BookDetails() {
   }, [dispatch, id]);
 
   const handleLoadReview = () => {
-    console.log('handleLoadReview');
     dispatch(getBookReviews(singleBook.title));
   };
 
-  console.log('BookDetails', review);
+  const handleDelete = () => {
+    console.log('handleDelete');
+    dispatch(handleDeleteBook(singleBook._id));
+  };
+
+  useEffect(() => {
+    if (deleteMessage === null) return;
+
+    window.confirm(deleteMessage);
+    if (isDelete) {
+      window.location.href = '/';
+    }
+  }, [deleteMessage]);
+
   return (
     <div>
       <div className="container mx-auto p-8">
@@ -38,10 +54,10 @@ export default function BookDetails() {
 
         <div className="bg-white rounded-lg shadow-md p-8">
           <h2 className="text-lg font-bold mb-4">Title</h2>
-          <p className="text-gray-600 mb-4">Author: {singleBook.title}</p>
-          <p className="text-gray-600 mb-4">Genre: {singleBook.genre} </p>
+          <p className="text-gray-600 mb-4">Author: {singleBook?.title}</p>
+          <p className="text-gray-600 mb-4">Genre: {singleBook?.genre} </p>
           <p className="text-gray-600 mb-4">
-            Publication Date: {singleBook.publication}{' '}
+            Publication Date: {singleBook?.publication}{' '}
           </p>
 
           <h2 className="text-lg font-bold mb-4">Reviews</h2>
@@ -76,7 +92,10 @@ export default function BookDetails() {
             >
               Edit
             </a>
-            <button className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 focus:outline-none">
+            <button
+              onClick={handleDelete}
+              className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 focus:outline-none"
+            >
               Delete
             </button>
           </div>
