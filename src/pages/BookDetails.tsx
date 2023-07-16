@@ -1,4 +1,31 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams } from 'react-router-dom';
+import { IInitialState } from '../store/slice/bookSlice';
+import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
+import { getBookDetails } from '../store/slice/singleBookSlice';
+
 export default function BookDetails() {
+  const { id } = useParams();
+  const { singleBook, isSuccess, isLoading } = useSelector(
+    (state: any) => state.singleBook
+  );
+
+  const dispatch: ThunkDispatch<IInitialState, void, AnyAction> = useDispatch();
+
+  useEffect(() => {
+    if (!id || id === '' || id === null) return;
+    if (!isSuccess && isLoading) {
+      window.confirm('Book not found');
+      window.location.href = '/';
+      return;
+    }
+
+    dispatch(getBookDetails(id));
+  }, [dispatch, id]);
+
+  console.log('BookDetails', id, singleBook);
   return (
     <div>
       <div className="container mx-auto p-8">
@@ -6,9 +33,11 @@ export default function BookDetails() {
 
         <div className="bg-white rounded-lg shadow-md p-8">
           <h2 className="text-lg font-bold mb-4">Title</h2>
-          <p className="text-gray-600 mb-4">Author: John Doe</p>
-          <p className="text-gray-600 mb-4">Genre: Mystery</p>
-          <p className="text-gray-600 mb-4">Publication Date: 2022-05-15</p>
+          <p className="text-gray-600 mb-4">Author: {singleBook.title}</p>
+          <p className="text-gray-600 mb-4">Genre: {singleBook.genre} </p>
+          <p className="text-gray-600 mb-4">
+            Publication Date: {singleBook.publication}{' '}
+          </p>
 
           <h2 className="text-lg font-bold mb-4">Reviews</h2>
           <div className="border border-gray-300 p-4 rounded">

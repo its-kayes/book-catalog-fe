@@ -19,8 +19,6 @@ export default function AllBooks() {
     dispatch(getBooks({}));
   }, [dispatch]);
 
-  // console.log(searchTerm);
-
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleSearchTerm = (e: any) => {
     const isSearchTermEmpty = searchTerm.length === 0;
@@ -76,7 +74,16 @@ export default function AllBooks() {
                 <h2 className="text-lg font-bold mb-2">{item.title}</h2>
                 <p className="text-gray-600 mb-2">Author: {item.author}</p>
                 <p className="text-gray-600 mb-2">Genre: {item.genre}</p>
-                <p className="text-gray-600">Publication: {item.publication}</p>
+                <div className="flex justify-between">
+                  <p className="text-gray-600">
+                    Publication: {item.publication}
+                  </p>
+                  <Link to={`/book-details/${item._id}`}>
+                    <button className="bg-blue-500 text-white px-2 rounded-md hover:bg-blue-600 focus:outline-none">
+                      Details
+                    </button>
+                  </Link>
+                </div>
               </div>
             </div>
           ))}
