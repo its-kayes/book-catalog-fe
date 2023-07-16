@@ -32,22 +32,39 @@ export const getBookReviews = createAsyncThunk(
 );
 
 export const handleDeleteBook = createAsyncThunk(
-    'singleBook/handleDeleteBook',
-    async (id: string, { rejectWithValue, fulfillWithValue }) => {
-      try {
-        const getToken = localStorage.getItem('token');
-        apiInstance.defaults.headers.common.authorization = `Bearer ${getToken}`;
-        const { data } = await apiInstance.delete(
-          `/book/delete/${id}`
-        );
-        return fulfillWithValue(data);
-      } catch (error) {
-        // console.log(error, "delete error");
-         const err = error as AxiosError<unknown>;
-        return rejectWithValue(err?.response?.data|| 'Unknown error from slice');
-      }
+  'singleBook/handleDeleteBook',
+  async (id: string, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const getToken = localStorage.getItem('token');
+      apiInstance.defaults.headers.common.authorization = `Bearer ${getToken}`;
+      const { data } = await apiInstance.delete(`/book/delete/${id}`);
+      return fulfillWithValue(data);
+    } catch (error) {
+      // console.log(error, "delete error");
+      const err = error as AxiosError<unknown>;
+      return rejectWithValue(err?.response?.data || 'Unknown error from slice');
     }
-  );
+  }
+);
+
+export const editBook = createAsyncThunk(
+  'singleBook/editBook',
+  async (
+    params: { id: string; keys: object },
+    { rejectWithValue, fulfillWithValue }
+  ) => {
+    try {
+      const { id, keys } = params;
+      const getToken = localStorage.getItem('token');
+      apiInstance.defaults.headers.common.authorization = `Bearer ${getToken}`;
+      const { data } = await apiInstance.patch(`/book/update/${id}`, keys);
+      return fulfillWithValue(data);
+    } catch (error) {
+      const err = error as AxiosError<unknown>;
+      return rejectWithValue(err?.response?.data || 'Unknown error from slice');
+    }
+  }
+);
 
 export interface ISingleBookState {
   singleBook: object | null;
@@ -59,6 +76,7 @@ export interface ISingleBookState {
   review?: object | null;
   isDelete: boolean;
   deleteMessage: string | null;
+  editMessage: null | string;
 }
 
 const initialState: ISingleBookState = {
@@ -71,6 +89,7 @@ const initialState: ISingleBookState = {
   review: null,
   isDelete: false,
   deleteMessage: null,
+  editMessage: null,
 };
 
 export const singleBookSlice = createSlice({
@@ -115,24 +134,41 @@ export const singleBookSlice = createSlice({
 
     // delete book
     builder.addCase(handleDeleteBook.pending, (state) => {
-        state.isLoading = true;
-      });
-      builder.addCase(handleDeleteBook.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.review = null;
-        state.singleBook = null;
-        state.isDelete = action.payload.success;
-        state.deleteMessage = action.payload.message;
-        state.statusCode = action.payload.statusCode;
-      });
-      builder.addCase(handleDeleteBook.rejected, (state, action: any) => {
-        state.isDelete = action.payload.success;
-        state.deleteMessage = action.payload.message;
-        state.statusCode = action.payload.statusCode;
-        state.isLoading = false;
-        state.message =
-          (action.payload.message as string) || 'Unknown error from slice';
-      });
+      state.isLoading = true;
+    });
+    builder.addCase(handleDeleteBook.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.review = null;
+      state.singleBook = null;
+      state.isDelete = action.payload.success;
+      state.deleteMessage = action.payload.message;
+      state.statusCode = action.payload.statusCode;
+    });
+    builder.addCase(handleDeleteBook.rejected, (state, action: any) => {
+      state.isDelete = action.payload.success;
+      state.deleteMessage = action.payload.message;
+      state.statusCode = action.payload.statusCode;
+      state.isLoading = false;
+      state.message =
+        (action.payload.message as string) || 'Unknown error from slice';
+    });
+
+    //edit book
+    builder.addCase(editBook.pending, (state) => {
+      state.isLoading = true;
+    });
+    builder.addCase(editBook.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.singleBook = action.payload.data;
+      state.isSuccess = action.payload.success;
+      state.editMessage = action.payload.message;
+      state.statusCode = action.payload.statusCode;
+    });
+    builder.addCase(editBook.rejected, (state, action: any) => {
+      state.isLoading = false;
+      state.editMessage =
+        (action.payload.message as string) || 'Unknown error from slice';
+    });
   },
 });
 

@@ -2,10 +2,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams } from 'react-router-dom';
-import { IInitialState } from '../store/slice/bookSlice';
+import { Link, useParams } from 'react-router-dom';
 import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
 import {
+  ISingleBookState,
   getBookDetails,
   getBookReviews,
   handleDeleteBook,
@@ -16,7 +16,8 @@ export default function BookDetails() {
   const { singleBook, isSuccess, isLoading, isDelete, review, deleteMessage } =
     useSelector((state: any) => state.singleBook);
 
-  const dispatch: ThunkDispatch<IInitialState, void, AnyAction> = useDispatch();
+  const dispatch: ThunkDispatch<ISingleBookState, void, AnyAction> =
+    useDispatch();
 
   useEffect(() => {
     if (!id || id === '' || id === null) return;
@@ -86,12 +87,12 @@ export default function BookDetails() {
           </div>
 
           <div className="flex justify-end mt-8">
-            <a
-              href="/edit-book"
+            <Link
+              to="/edit-book"
               className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none mr-2"
             >
               Edit
-            </a>
+            </Link>
             <button
               onClick={handleDelete}
               className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 focus:outline-none"
