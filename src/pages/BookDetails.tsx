@@ -10,11 +10,14 @@ import {
   getBookReviews,
   handleDeleteBook,
 } from '../store/slice/singleBookSlice';
+import { giveReview } from '../store/slice/bookSlice';
 
 export default function BookDetails() {
   const { id } = useParams();
   const { singleBook, isSuccess, isLoading, isDelete, review, deleteMessage } =
     useSelector((state: any) => state.singleBook);
+
+  const { reviewMessage } = useSelector((state: any) => state.books);
 
   const dispatch: ThunkDispatch<ISingleBookState, void, AnyAction> =
     useDispatch();
@@ -39,6 +42,23 @@ export default function BookDetails() {
     dispatch(handleDeleteBook(singleBook._id));
   };
 
+  const username = JSON.parse(localStorage.getItem('user') as string);
+
+  const handleGiveReview = (e: any) => {
+    e.preventDefault();
+    const review = e.target.review.value;
+    dispatch(
+      giveReview({
+        review,
+        book: singleBook.title,
+        rating: 5,
+        username: username.username,
+      })
+    );
+
+    e.target.review.value = '';
+  };
+
   useEffect(() => {
     if (deleteMessage === null) return;
 
@@ -47,6 +67,12 @@ export default function BookDetails() {
       window.location.href = '/';
     }
   }, [deleteMessage]);
+
+  useEffect(() => {
+    if (reviewMessage === null) return;
+
+    window.confirm(reviewMessage);
+  }, [reviewMessage]);
 
   return (
     <div>
@@ -60,6 +86,25 @@ export default function BookDetails() {
           <p className="text-gray-600 mb-4">
             Publication Date: {singleBook?.publication}{' '}
           </p>
+
+          <form onSubmit={handleGiveReview} action="">
+            <h2 className="text-lg font-bold mb-4">Give reviews</h2>
+            <input
+              type="text"
+              name="review"
+              className=" border border-black py-2 px-4 rounded w-full mb-4 "
+            />
+
+            <div className="w-full flex justify-end">
+              <button
+                type="submit"
+                className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 focus:outline-none mr-2"
+              >
+                {' '}
+                Post{' '}
+              </button>
+            </div>
+          </form>
 
           <h2 className="text-lg font-bold mb-4">Reviews</h2>
           <div className="border border-gray-300 p-4 rounded">

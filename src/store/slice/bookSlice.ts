@@ -27,6 +27,19 @@ export const getBooks = createAsyncThunk(
   }
 );
 
+export const giveReview = createAsyncThunk(
+  'books/giveReview',
+  async (keys: object, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const { data } = await apiInstance.post(`/review/give-review`, keys);
+      return fulfillWithValue(data);
+    } catch (error) {
+      const err = error as Error;
+      return rejectWithValue(err?.message || 'Unknown error from slice');
+    }
+  }
+);
+
 export interface IInitialState {
   books: any[];
   isLoading: boolean;
@@ -34,6 +47,7 @@ export interface IInitialState {
   isSuccess: boolean;
   statusCode: number | null;
   meta?: object | null;
+  reviewMessage: string | null;
 }
 
 const initialState: IInitialState = {
@@ -43,6 +57,7 @@ const initialState: IInitialState = {
   isSuccess: false,
   statusCode: null,
   meta: null,
+  reviewMessage: null,
 };
 
 export const booksSlice = createSlice({
@@ -65,6 +80,22 @@ export const booksSlice = createSlice({
     builder.addCase(getBooks.rejected, (state, action: any) => {
       state.isLoading = false;
       state.message =
+        (action.payload.message as string) || 'Unknown error from slice';
+    });
+
+    // Post review
+    builder.addCase(giveReview.pending, (state) => {
+      state.isLoading = true;
+    });
+    builder.addCase(giveReview.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.isSuccess = action.payload.success;
+      state.reviewMessage = action.payload.message;
+      state.statusCode = action.payload.statusCode;
+    });
+    builder.addCase(giveReview.rejected, (state, action: any) => {
+      state.isLoading = false;
+      state.reviewMessage =
         (action.payload.message as string) || 'Unknown error from slice';
     });
   },
