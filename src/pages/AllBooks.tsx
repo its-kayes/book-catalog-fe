@@ -1,5 +1,5 @@
-// import { Dispatch } from '@reduxjs/toolkit';
-import { useEffect } from 'react';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { IInitialState, getBooks } from '../store/slice/bookSlice';
@@ -7,16 +7,29 @@ import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
 import { IBook } from '../interface/book/book.interface';
 
 export default function AllBooks() {
+  const [searchTerm, SetSearchTerm] = useState<string>('');
+
   const { books }: { books: IBook[] } = useSelector(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (state: any) => state.books
   );
 
   const dispatch: ThunkDispatch<IInitialState, void, AnyAction> = useDispatch();
 
   useEffect(() => {
-    dispatch(getBooks());
+    dispatch(getBooks({}));
   }, [dispatch]);
+
+  // console.log(searchTerm);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleSearchTerm = (e: any) => {
+    const isSearchTermEmpty = searchTerm.length === 0;
+    if (isSearchTermEmpty) {
+      return;
+    } else {
+      dispatch(getBooks({ searchTerm }));
+    }
+  };
 
   return (
     <div>
@@ -28,9 +41,13 @@ export default function AllBooks() {
           <input
             type="text"
             placeholder="Search books..."
+            onChange={(e) => SetSearchTerm(e.target.value)}
             className="w-full p-2 rounded-l-md border border-gray-300 focus:outline-none focus:border-blue-500"
           />
-          <button className="bg-blue-500 text-white rounded-r-md px-4 hover:bg-blue-600 focus:outline-none">
+          <button
+            onClick={handleSearchTerm}
+            className="bg-blue-500 text-white rounded-r-md px-4 hover:bg-blue-600 focus:outline-none"
+          >
             Search
           </button>
         </div>
