@@ -6,7 +6,7 @@ import { AnyAction, ThunkDispatch } from '@reduxjs/toolkit';
 import { useEffect } from 'react';
 
 export default function Signup() {
-  const { auth, message } = useSelector((state: any) => state.auth);
+  const { message } = useSelector((state: any) => state.auth);
 
   const dispatch: ThunkDispatch<IAuthInitialState, void, AnyAction> =
     useDispatch();
@@ -23,8 +23,6 @@ export default function Signup() {
     if (!message || message === '' || message === null) return;
     window.confirm(message);
   }, [message]);
-
-  console.log(auth);
 
   return (
     <div>
