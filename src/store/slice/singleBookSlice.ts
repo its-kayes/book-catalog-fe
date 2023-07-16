@@ -66,6 +66,21 @@ export const editBook = createAsyncThunk(
   }
 );
 
+export const addBook = createAsyncThunk(
+  'singleBook/addBook',
+  async (keys: object, { rejectWithValue, fulfillWithValue }) => {
+    try {
+      const getToken = localStorage.getItem('token');
+      apiInstance.defaults.headers.common.authorization = `Bearer ${getToken}`;
+      const { data } = await apiInstance.post(`/book/add`, keys);
+      return fulfillWithValue(data);
+    } catch (error) {
+      const err = error as AxiosError<unknown>;
+      return rejectWithValue(err?.response?.data || 'Unknown error from slice');
+    }
+  }
+);
+
 export interface ISingleBookState {
   singleBook: object | null;
   isLoading: boolean;
@@ -77,6 +92,7 @@ export interface ISingleBookState {
   isDelete: boolean;
   deleteMessage: string | null;
   editMessage: null | string;
+  addMessage: null | string;
 }
 
 const initialState: ISingleBookState = {
@@ -90,12 +106,13 @@ const initialState: ISingleBookState = {
   isDelete: false,
   deleteMessage: null,
   editMessage: null,
+  addMessage: null,
 };
 
 export const singleBookSlice = createSlice({
   name: 'singleBook',
   initialState,
-  reducers: {}, // Add an empty object if you don't have any extra reducers to include
+  reducers: {},
 
   extraReducers: (builder) => {
     // get book details
@@ -165,6 +182,23 @@ export const singleBookSlice = createSlice({
       state.statusCode = action.payload.statusCode;
     });
     builder.addCase(editBook.rejected, (state, action: any) => {
+      state.isLoading = false;
+      state.editMessage =
+        (action.payload.message as string) || 'Unknown error from slice';
+    });
+
+    //add book
+    builder.addCase(addBook.pending, (state) => {
+      state.isLoading = true;
+    });
+    builder.addCase(addBook.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.singleBook = action.payload.data;
+      state.isSuccess = action.payload.success;
+      state.addMessage = action.payload.message;
+      state.statusCode = action.payload.statusCode;
+    });
+    builder.addCase(addBook.rejected, (state, action: any) => {
       state.isLoading = false;
       state.editMessage =
         (action.payload.message as string) || 'Unknown error from slice';
